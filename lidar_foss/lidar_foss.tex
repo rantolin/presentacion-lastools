@@ -1,0 +1,1188 @@
+%==================================================================FRONT PAGE AND TOC
+% For article only
+\mode<presentation:0>{\thispagestyle{empty}\maketitle}
+
+% For presentation only
+\mode<presentation| article:0| handout:0>{
+    \begin{frame}<article:0>[label=portada]
+    \titlepage
+    \end{frame}%Fin del frame
+}
+
+% For handout only
+\mode<handout>{
+  \begin{frame}[label=portada]
+    \maketitle
+  \end{frame}
+}
+
+% %% TABLE OF CONTENTS
+% \begin{frame}[label=toc]
+%     \mode<article:0>{\frametitle{Contents}}
+%     \mode<presentation>{\small}
+%     \tableofcontents[hidesubsections]
+% \end{frame}
+
+\begin{frame}[label=portada]
+ \titlepage
+\end{frame}
+\begin{frame}[label=toc]
+\tableofcontents[hidesubsections]
+\end{frame}
+
+%%==================================================================S INTRODUCTION
+\section{Herramientas}
+%%==================================================================F 
+\begin{frame}
+    \frametitle{Herramientas}
+    \begin{enumerate}
+        \item GRASS LiDAR tools 
+	\begin{itemize}
+            \item \texttt{v.outlier}
+            \item \texttt{v.lidar.edgedetetion}
+            \item \texttt{v.lidar.growing}
+            \item \texttt{v.lidar.correction}
+            \item \texttt{v.surf.bspline}
+	\end{itemize}
+        \item LibLAS
+	\begin{itemize}
+            \item \texttt{las2las}, \texttt{las2txt}, \texttt{txt2las}, \texttt{lasdiff}, \texttt{lasinfo} 
+	\end{itemize}
+        \item LAStools
+	\begin{itemize}
+            \item \texttt{las2las}, \texttt{las2txt}, \texttt{txt2las},
+                \texttt{shp2las}, \texttt{lasground}, \texttt{las2dem}, \texttt{txt2tin}
+	\end{itemize}
+        \item PCL (Point Cloud Library)
+        \item PDAL (Point Data Abstraction Library)
+    \end{enumerate}
+\end{frame}
+%%==================================================================S
+\section{Análisis LiDAR en GRASS}
+%%==================================================================Sb
+\begin{frame}
+    \frametitle{Geographic Resources Analysis Support System\hfill
+        \includegraphics[width=0.7cm]{images/grasslogo_transp_big.png}} 
+     \begin{itemize}
+        \item Conocido como \alert<1>{GRASS}: GIS para manipulación y
+            análisis de datos geoespaciales.
+        \item Como es un programa de \alert{códico abierto} con un montón de
+            librerias, es muy adecuado para la implementación de nuestras
+            propias herramientas.
+        \item Escrito en C/C++, lo que permite implementar programas
+            computacionalmente pesados $\Rightarrow$ \alert{ideal} para trabajar
+            con LiDAR.
+        \item GRASS $\geq$ 6 incluye indexación topológica $\Rightarrow$
+            \alert{fatal} para trabajar con LiDAR.  \item Hay versiones para
+            GNU/Linux, MS-Windows, Mac-OSX, SUN, etc.
+            \alert{\textexclamdown\textexclamdown Todos lo pueden utilizar!!}
+        \item Más información en:
+            \beamergotobutton{\url{http://grass.osgeo.ogr}}
+    \end{itemize}
+\end{frame}
+%%==================================================================Sb
+\subsection{Importando nube de puntos}
+%%==================================================================F 
+\begin{frame}
+ \frametitle{Importar como raster: \LARGE\path{r.in.xyz}}
+\end{frame}
+%%==================================================================F 
+\begin{frame}
+ \frametitle{Importar como vectorial: \LARGE\path{v.in.ascii}}
+\end{frame}
+%%==================================================================Sb
+\subsection{Eliminando puntos groseros}
+%%==================================================================F 
+\begin{frame}[fragile,shrink=5]
+  \frametitle{\path{v.outlier}}
+  \begin{beamerboxesrounded}[shadow=true]{\textbf{\path{v.lidar.edgedetection}}
+    \texttt{ input=name output=name outlier=name [soe=value] [son=value] 
+    [lambda\_i=value] [thres\_o=value]}}
+    \begin{itemize}
+      \item \textbf{input}: name of the input vector map
+      \item \textbf{output}: name of the output vector map
+      \item \textbf{soe}: Interpolation spline step value in e-w direction
+      \item \textbf{son}: Interpolation spline step value in n-s direction
+      \item \textbf{lambda\_i}: Thychonov regularization weigth. (default: 0.1)
+      \item \textbf{thres\_o}: Threshold for the outliers. (default: 50)
+    \end{itemize}
+  \end{beamerboxesrounded}
+  \pause
+  \begin{beamerboxesrounded}[shadow=true]{Sintaxis}
+\scriptsize
+%\testcode
+\begin{verbatim}
+GRASS6 (stuttgart): > # Limpiamos el primer impulso
+GRASS6 (stuttgart): > v.outlier in=stuttgart_first out=station_first \
+> outlier=station_first_out soe=10 son=10 thres_o=25
+GRASS6 (stuttgart): > # Limpiamos el ultimo impulso
+GRASS6 (stuttgart): > v.outlier in=stuttgart_last out=station_last \
+> outlier=station_last_out soe=10 son=10 thres_o=30
+\end{verbatim}
+
+\end{beamerboxesrounded}
+\end{frame}
+%%==================================================================F 
+\begin{frame}
+ \frametitle{Visualización de \LARGE\path{v.outlier}}
+\end{frame}
+%%==================================================================Sb
+\subsection{Detección de borde de objetos}
+%%==================================================================F 
+\begin{frame}[fragile,shrink=10]
+  \frametitle{\path{v.lidar.edgedetection}}
+  \begin{beamerboxesrounded}[shadow=true]{\textbf{\path{v.lidar.edgedetection}}
+    \texttt{ input=name output=name first=name see=value sen=value 
+    [lambda\_g=value] [tgh=value] [tgl=value] [theta\_g=value] [lambda\_r=value]}}
+   \begin{itemize}
+    \item \textbf{input}: name of the input vector map
+    \item \textbf{output}: name of the output vector map
+    \item \textbf{see}: Interpolation spline step value in e-w direction
+    \item \textbf{sen}: Interpolation spline step value in n-s direction
+    \item \textbf{lambda\_g}: Regularization weight in gradient evaluation (default: 0.01)
+    \item \textbf{tgh}: High gradient threshold for edge classification (default: 6)
+    \item \textbf{tgl}: Low gradient threshold for edge classification (default: 3)
+    \item \textbf{theta\_g}: Angle range for same direction detection (default: 0.26)
+    \item \textbf{lambda\_r}: Regularization weight in residual evaluation (default: 2)
+   \end{itemize}
+  \end{beamerboxesrounded}
+ \pause
+ \begin{beamerboxesrounded}[shadow=true]{Sintaxis}
+\scriptsize
+%\testcode
+\begin{verbatim}
+GRASS6 (stuttgart): > v.lidar.edgedetection in=station_last see=4 sen=4 \
+> lambda_g=0.1 out=station_edge
+\end{verbatim}
+\end{beamerboxesrounded}
+\end{frame}
+%%==================================================================F 
+\pgfdeclareimage[width=0.65\textwidth]{edge}{images/edge}
+\begin{frame}
+ \frametitle{Visualización de \LARGE\path{v.lidar.edgedetection}}
+\begin{columns}
+  \begin{column}{0.7\textwidth}
+    \begin{center}
+	\begin{tikzpicture}
+    	  \pgftext[bottom,left,at={\pgfpointxy{0}{0}}]{\pgfuseimage{edge}}
+	\end{tikzpicture}
+   \end{center}
+  \end{column}
+  \begin{column}{0.25\textwidth}
+	\begin{enumerate}
+	 \item \textcolor{red}{Borde}
+	 \item \textcolor{yellow!95!black}{Terreno}
+	\end{enumerate}
+  \end{column}
+\end{columns}
+\end{frame}
+%%==================================================================Sb
+\subsection{Relleno de los límites de los objetos}
+%%==================================================================F 
+\begin{frame}[fragile,shrink=10]
+  \frametitle{\path{v.lidar.growing}}
+  \begin{beamerboxesrounded}[shadow=true]{\textbf{\path{v.lidar.growing}}
+    \texttt{ input=name output=name first=name [tj=value] [td=value]}}
+    \begin{itemize}
+     \item \textbf{input}: name of the input vector map
+     \item \textbf{output}: name of the output vector map
+     \item \textbf{first}: name of the input vector map of the first pulse points
+     \item \textbf{tj}: Threshold in planimetric units for considering two 
+         measurements as corresponding first and double pulse. (default 0.2)
+     \item td: Threshold in height units for classifying a point as double pulse. 
+         (default: 0.6)
+    \end{itemize}
+  \end{beamerboxesrounded}
+  \pause
+  \begin{beamerboxesrounded}[shadow=true]{Sintaxis}
+\scriptsize
+\begin{verbatim}
+GRASS6 (stuttgart): > # Se disminuye primero la resolucion
+GRASS6 (stuttgart): > g.region -p res=2
+GRASS6 (stuttgart): > v.lidar.growing in=station_edge out=station_grow \
+> first=station_first
+\end{verbatim}
+\end{beamerboxesrounded}
+\begin{itemize}
+ \item \alert{Importante!!} Bajar la resolución de la región
+\end{itemize}
+\end{frame}
+%%==================================================================F 
+\pgfdeclareimage[width=0.65\textwidth]{grow}{images/grow}
+\begin{frame}
+ \frametitle{Visualización de \LARGE\path{v.lidar.growing}}
+\begin{columns}
+  \begin{column}{0.65\textwidth}
+    \begin{center}
+	\begin{tikzpicture}
+    	  \pgftext[bottom,left,at={\pgfpointxy{0}{0}}]{\pgfuseimage{grow}}
+	\end{tikzpicture}
+   \end{center}
+  \end{column}
+  \begin{column}{0.35\textwidth}
+	\begin{enumerate}
+	 \item \textcolor{yellow!95!black}{Terreno}
+	 \item \textcolor{green}{Terreno doble eco}
+	 \item \textcolor{blue!90!black}{Objeto doble eco}
+	 \item \textcolor{red}{Objeto}
+	\end{enumerate}
+  \end{column}
+\end{columns}
+\end{frame}
+%%==================================================================Sb
+\subsection{Corrección final}
+%%==================================================================F 
+\begin{frame}[fragile,shrink=5]
+  \frametitle{\path{v.lidar.correction}}
+  \begin{beamerboxesrounded}[shadow=true]{\textbf{\path{v.lidar.correction}}
+    \texttt{ input=name  output=name  terrain=name  sce=value  scn=value 
+    [lambda\_c=value]  [tch=value]  [tcl=value]}}
+    \begin{itemize}
+     \item \textbf{input}: name of the input vector map
+     \item \textbf{output}: name of the output vector map
+     \item \textbf{terrain}: name of the terrain output vector map
+     \item \textbf{sce}: Interpolation spline step value in e-w direction
+     \item \textbf{scn}: Interpolation spline step value in n-s direction
+     \item \textbf{lambda\_c}: Regularization weight in reclassification evaluation. (default 1)
+     \item \textbf{tch}: High difference threshold (terrain/object). (default 2)
+     \item \textbf{tcl}: Low differnce threshold (object/terrain). (default 1)
+    \end{itemize}
+  \end{beamerboxesrounded}
+  \pause
+  \begin{beamerboxesrounded}[shadow=true]{Sintaxis}
+\scriptsize
+\begin{verbatim}
+GRASS6 (stuttgart): > v.lidar.correction in=station_grow sce=60 scn=60 \
+> lambda_c=2 tcl=0.1 out=station_corr terrain=station_terr
+\end{verbatim}
+  \end{beamerboxesrounded}
+\end{frame}
+%%==================================================================F 
+\pgfdeclareimage[width=0.65\textwidth]{corr}{images/correction}
+\begin{frame}
+ \frametitle{Visualización de \LARGE\path{v.lidar.correction}}
+\begin{columns}
+  \begin{column}{0.65\textwidth}
+    \begin{center}
+	\begin{tikzpicture}
+    	  \pgftext[bottom,left,at={\pgfpointxy{0}{0}}]{\pgfuseimage{corr}}
+	\end{tikzpicture}
+   \end{center}
+  \end{column}
+  \begin{column}{0.35\textwidth}
+	\begin{enumerate}
+	 \item \textcolor{yellow!95!black}{Terreno}
+	 \item \textcolor{green}{Terreno doble eco}
+	 \item \textcolor{blue!90!black}{Objeto doble eco}
+	 \item \textcolor{red}{Objeto}
+	\end{enumerate}
+  \end{column}
+\end{columns}
+\end{frame}
+
+
+
+
+
+
+%%==================================================================S INTRODUCTION
+\section{¿Qué es MATLAB?}
+%%==================================================================F 
+\begin{frame}[label=que_es]
+    \frametitle{¿Qué es MATLAB?}
+    \begin{enumerate}
+        \item \alert{MAT}rix \alert{LAB}oratory
+        \item Propiedad de MathWorks (\url{http://www.mathworks.es/})
+        \item Programa para cálculo científico y de ingeniería
+	\begin{itemize}
+	 \item Extensible (\emph{toolboxes})
+         \item Lenguaje de programación proprio interpretado (\alert{M})
+         \item Visualización interactiva de gráficos
+         \item Integrable con aplicaciones escritas en otros lenguajes
+	\end{itemize}
+        \item Existen implementaciones libres del lenguaje M
+	\begin{itemize}
+	 \item Scilab (\url{http://www.scilab.org})
+	 \item Octave (\url{http://www.gnu.org/software/octave/})
+	\end{itemize}
+    \end{enumerate}
+\end{frame}
+%%==================================================================F
+\begin{frame}[label=vista_ppal]
+ \frametitle{Vista principal de MATLAB}
+  \begin{center}
+   \includegraphics[width=0.7\paperwidth ]{images/matlab_vista_ppal}
+  \end{center}
+\end{frame}
+%%==================================================================F 
+\section{Variables y tipos de datos}
+\begin{frame}[label=variables]
+ \frametitle{Variables y tipos}
+ \begin{enumerate}
+  \item Todos los cálculos se guardan en variables
+  \begin{itemize}
+   \item \texttt{Identificador = Contenido}
+   \begin{itemize}
+    \item \texttt{a = 3}
+    \item \texttt{b=a}
+    \item \texttt{a = a + 1}
+   \end{itemize}
+  \end{itemize}
+  \item Tipos básicos
+  \begin{itemize}
+   \item Enteros: \texttt{43, -1, 15}
+   \item Reales: \texttt{8.5, .23, -2.7e3, 0.4e-2}
+   \item Complejos: \texttt{3+2i, 9+1.4e-5i, 2+3j}
+  \end{itemize}
+ \end{enumerate}
+\end{frame}
+%%==================================================================F 
+\subsection{Constantes}
+\begin{frame}[label=constantes,shrink=5]
+ \frametitle{Constantes}
+ \begin{enumerate}
+  \item Valores constantes predefinidos en MATLAB
+  \begin{itemize}
+   \item Infinito: \texttt{Inf, inf}
+   \item ``Not a number'': \texttt{nan, NaN}
+   \item \alert{¡No debería usarse como nombres de variables!}
+  \end{itemize}
+ \end{enumerate}
+ \begin{center}
+  \begin{scriptsize}
+  \rowcolors{1}{ZurichBlue!20}{ZurichBlue!5}
+   \begin{tabular}{|c|p{3.5cm}|c|}
+   \multicolumn{1}{c}{\textbf{Nombre Constante}} 
+   & \multicolumn{1}{c}{\textbf{Significado}} 
+   & \multicolumn{1}{c}{\textbf{Valor}} \\ \toprule \hline
+   \texttt{pi} & Constante $\pi$ & \texttt{3.14159265...} \\ \hline
+   \texttt{e} & Constante $e$ & \texttt{2.71828182...} \\ \hline
+   \texttt{i} & Unidad imaginaria & $\sqrt{-1}$ \\ \hline
+   \texttt{j} & Unidad imaginaria & $\sqrt{-1}$ \\ \hline
+   \texttt{intmax} & Entero más grande  & \texttt{2147483647} \\ \hline
+   \texttt{intmin} & Entero más pequeño & \texttt{-2147483648} \\ \hline
+   \texttt{realmax} & Número positivo más grande en doble precisión  &
+\texttt{1.7977e+308} \\ \hline
+   \texttt{realmin} & Número positivo más pequeño en doble precisión &
+\texttt{2.2251e-308} \\ \hline
+   \texttt{eps} & Precisión relativa en doble precisión & \texttt{2.2204e-16}
+\\ \hline
+  \end{tabular}
+  \end{scriptsize}
+ \end{center}
+\end{frame}
+%%==================================================================F 
+\subsection{Enteros, reales, complejos y cadenas}
+\begin{frame}[label=tipos_enteros]
+ \frametitle{Tipos de datos enteros y reales}
+ \begin{center}
+  \begin{scriptsize}
+  %\rowcolors{3}{ZurichBlue!20}{ZurichBlue!5}
+   \begin{tabular}{|c|c|c|p{5cm}|}
+   \multicolumn{1}{c}{ } & \multicolumn{1}{c}{\textbf{Tipo}} &
+    \multicolumn{1}{c}{\textbf{Tamaño (bytes)}} &
+    \multicolumn{1}{c}{\textbf{Rango}} \\ \toprule \hline
+   \multirow{5}{*}{Enteros con signo} & \texttt{int8} & 1 & \texttt{-128 a 127}
+    \\ \cline{2-4}
+   & \texttt{int16} & 2 & \texttt{-32768 a 32767} \\ \cline{2-4}
+   & \texttt{int32} & 4 & \texttt{-2147483648 a 2147483647} \\ \cline{2-4}
+   & \multirow{2}{*}{\texttt{int64}} & \multirow{2}{*}{6} &
+    \texttt{-9223372036854775808 a} \\ 
+   & & & \texttt{9223372036854775807} \\ \hline
+   \multirow{5}{*}{Enteros sin signo} & \texttt{uint8} & 1 & \texttt{0 a 255}
+    \\ \cline{2-4}
+   & \texttt{uint16} & 2 & \texttt{0 a 65535} \\ \cline{2-4}
+   & \texttt{uint32} & 4 & \texttt{0 a 4294967295} \\ \cline{2-4}
+   & \texttt{uint64} & 8 & \texttt{0 a 18446744073709551615} \\ \hline
+   \multirow{2}{*}{Reales} & \texttt{single} & 4 & \texttt{-3.4028e+38 a
+3.4028e+38} \\ \cline{2-4}
+    & \texttt{double} & 8 & \texttt{-1.7977e+308 a 1.7977e+308} \\ \hline
+  \end{tabular}
+  \end{scriptsize}
+ \end{center}
+\end{frame}
+%%==================================================================F 
+\begin{frame}[label=tipo_reales]
+ \frametitle{Formato de tipo de datos reales: \texttt{format}}
+ \begin{enumerate}
+  \item \texttt{format}: Especifica el formato de salida de los números.
+  \item Representación del número $\pi$:
+  \begin{itemize}
+    \item \alert{\texttt{short}}: \texttt{3.1416}
+    \begin{itemize}
+     \item \texttt{short e}: \texttt{3.1416e+00}
+     \item \alert{\texttt{short g}}: \\ \texttt{pi .\^\ [2; 4; 8; 16]\\
+        9.8696\\97.409\\9488.5\\9.0032e+07}
+    \end{itemize}
+    \item \alert{\texttt{long}}: \texttt{3.14159265358979}
+    \begin{itemize}
+     \item \texttt{long e}: \texttt{3.14159265358979e+00}
+     \item \alert{\texttt{long g}}: \texttt{3.14159265358979}                          
+    \end{itemize}
+  \end{itemize}
+  \item \alert{\texttt{>> help format}}
+ \end{enumerate}
+\end{frame}
+%%==================================================================F 
+\begin{frame}[label=complejos]
+ \frametitle{Números complejos}
+ \begin{enumerate}
+  \item Números complejos 
+    \begin{itemize}
+     \item Se usa la constante \alert{\texttt{i}} o \texttt{j} para expresar un número
+        complejo
+     \item Operaciones aritméticas:
+      \begin{itemize}
+        \item Suma: \texttt{z+w}
+        \item Producto: \texttt{z*w}
+        \item Cociente: \texttt{z/w}
+        \item Conjugado: \texttt{z'}
+      \end{itemize}
+     \item Funciones:
+      \begin{itemize}
+       \item Parte real: \texttt{real(z)}
+       \item Parte imaginaria: \texttt{imag(z)}
+       \item Complejo conjugado: \texttt{conj(z)}
+       \item Módulo: \texttt{abs(z)}
+       \item Argumento: \texttt{angle(z)}
+      \end{itemize}
+    \end{itemize}
+ \end{enumerate}
+\end{frame}
+%%==================================================================F
+\subsection{Arrays: vectores y matrices}
+\begin{frame}[label=arrays]
+ \frametitle{¿Qué son los arrays?}
+ \begin{enumerate}
+  \item Generalmente son una colección de valores del mismo tipo
+  \item Son un tipo de dato fundamental en Matlab
+  \item Indexados mediante enteros o, incluso, un array de enteros
+  \item Pueden ser filas o columnas
+   \begin{itemize}
+    \item \texttt{>> array = [0, 1, 2, 3]\\array = \\ \hspace*{0.5cm} 0 1 2 3}
+    \item \texttt{>> column = [0; 1; 2; 3]\\column = \\ \hspace*{0.5cm} 0
+        \\\hspace*{0.5cm} 1 \\\hspace*{0.5cm} 2 \\\hspace*{0.5cm} 3}
+  \end{itemize}
+\end{enumerate}
+\end{frame}
+%%==================================================================F
+\begin{frame}[label=arrays2]
+ \frametitle{Otras maneras de definir arrays}
+ \begin{enumerate}
+  \item Mediante una sucesión: \\\texttt{a=[0:4], a=(0:4), a=0:4}
+  \item Con un incremento definido: \\\texttt{a=[0:2:10], a=(0:2:10), a=0:2:10}
+  \item $N$ componentes equiespaciadas entre dos valores:
+    \\\texttt{>> x=linspace(0,10,4) \\x = \\ \hspace*{0.5cm} 0.00000
+\hspace*{0.25cm} 3.33333 \hspace*{0.25cm} 6.66667 \hspace*{0.25cm} 10.00000}
+\end{enumerate}
+\end{frame}
+%%==================================================================F
+\begin{frame}[label=matrices]
+ \frametitle{Matrices}
+ \begin{enumerate}
+  \item Son vectores multi-dimensionales
+  \item Para crear matrices, se crea dos vectores apilados en una columna
+    \\\texttt{>> matriz = [1, 2, 3; 4, 5, 6] \\matriz = \\ \hspace*{0.5cm} 1
+    \hspace*{0.25cm} 2 \hspace*{0.25cm} 3 \\ \hspace*{0.5cm} 4 \hspace*{0.25cm}
+    5 \hspace*{0.25cm} 6}
+ \end{enumerate}
+\end{frame}
+%%==================================================================F
+\begin{frame}[label=cadenas]
+ \frametitle{Cadenas de texto}
+   \begin{enumerate}
+    \item Se asignan con comillas simples: \texttt{s = '¡Hola, Mundo!'}
+    \item Se pueden editar en el \emph{workspace}
+   \end{enumerate}
+  \begin{center}
+   \includegraphics[height=3cm]{images/cadena_workspace}
+  \end{center}
+\end{frame}
+%%==================================================================F
+\section{Operadores}
+%%==================================================================F 
+\subsection{Asignación}
+\begin{frame}[label=oper_asignacion]
+ \frametitle{Operador asignación}
+ \begin{enumerate}
+ \item Operador asignación es el igual: \alert{\texttt{=}}
+ \item Sirve para asignar valores a variables
+  \begin{itemize}
+   \item Ejemplo: \texttt{x=3}
+   \item \alert{No confundir} con el operador de comparación:
+        \alert{\texttt{==}} (un doble igual)
+  \end{itemize}
+ \item Si la variable no existe, se \alert{crea}
+ \item Si existe, se \alert{sobre-escribe} y \alert{pierde} su valor anterior
+ \end{enumerate}
+\end{frame}
+%%==================================================================F 
+\subsection{Aritméticos}
+\begin{frame}[label=oper_aritmeticos]
+ \frametitle{Operadores aritméticos}
+ \begin{center}
+ \begin{small}
+ \rowcolors{1}{ZurichBlue!20}{ZurichBlue!5}
+  \begin{tabular}{|c|c|c|}
+  \multicolumn{1}{c}{Operador} & \multicolumn{1}{c}{Símbolo} &
+       \multicolumn{1}{c}{Ejemplo} \\ \toprule \hline
+  Suma & \texttt{+} & \texttt{3+2} \\ \hline
+  Resta & \texttt{-} & \texttt{3-2} \\ \hline
+  Producto & \texttt{*} & \texttt{3*2} \\ \hline
+  División derecha & \texttt{/} & \texttt{3/2} \\ \hline
+  División izquierda & \texttt{\textbackslash} & \texttt{3\textbackslash 2} \\
+\hline
+  Potencia & \texttt{\^\ } & \texttt{3\^{}2} \\ \hline
+  Resto de división entera & \texttt{rem(a,b)} & \texttt{rem(3,2)} \\
+\hline
+  \end{tabular}
+ \end{small}
+ \end{center}
+\end{frame}
+%%==================================================================F
+\subsection{Relacionales y de igualdad}
+\begin{frame}[label=oper_relacionales]
+ \frametitle{Operadores relacionales y de igualdad}
+ \begin{center}
+ \begin{small}
+\rowcolors{1}{ZurichBlue!20}{ZurichBlue!5}
+  \begin{tabular}{|c|c|c|}
+  \multicolumn{1}{c}{Operador} & \multicolumn{1}{c}{Símbolo} &
+       \multicolumn{1}{c}{Ejemplo} \\ \toprule \hline
+  Menor que & \texttt{<} & \texttt{3<2} \\ \hline
+  Mayor que & \texttt{>} & \texttt{3>2} \\ \hline
+  Menor o igual que & \texttt{<=} & \texttt{3<=2} \\ \hline
+  Mayor o igual que & \texttt{>=} & \texttt{3>=2} \\ \hline
+  Es igual & \texttt{==} & \texttt{3==2} \\
+\hline
+  Es diferente & \texttt{$\sim$=} & \texttt{3$\sim$=2} \\ \hline 
+  \end{tabular}
+ \end{small}
+ \end{center}
+ Devuelven un \alert{booleano} (True o False)
+\end{frame}
+%%==================================================================F
+\subsection{Lógicos}
+\begin{frame}[label=oper_logicos]
+ \frametitle{Operadores lógicos}
+\begin{columns} % contents are top vertically aligned
+ \begin{column}{3cm} % each column can also be its own environment
+   \begin{enumerate}[<+->]%
+    \item \alert<1>{Y lógico}
+    \item \alert<2>{O lógico}
+    \item \alert<3>{XOR}
+    \item \alert<4>{NO}
+   \end{enumerate}
+ \end{column}
+ \begin{column}{7cm} % alternative top-align that's better for graphics
+   \only<1>{
+    \begin{center}
+    \begin{small}
+    \rowcolors{1}{ZurichBlue!20}{ZurichBlue!5}
+    \begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|}
+    \multicolumn{3}{c}{\texttt{\textbf{C = A \& B}}} \\ \toprule \hline
+   \textbf{A} & \textbf{B} & \textbf{C} \\ \hline
+    1 & 1 & 1 \\ \hline
+    1 & 0 & 0 \\ \hline
+    0 & 1 & 0 \\ \hline
+    0 & 0 & 0 \\ \hline
+    \end{tabular}
+    \end{small}
+    \end{center}}
+
+   \only<2>{
+    \begin{center}
+    \begin{small}
+    \rowcolors{1}{ZurichBlue!20}{ZurichBlue!5}
+    \begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|}
+    \multicolumn{3}{c}{\texttt{\textbf{C = A | B}}} \\ \toprule \hline
+   \textbf{A} & \textbf{B} & \textbf{C} \\ \hline
+    1 & 1 & 1 \\ \hline
+    1 & 0 & 1 \\ \hline
+    0 & 1 & 1 \\ \hline
+    0 & 0 & 0 \\ \hline
+    \end{tabular}
+    \end{small}
+    \end{center}}
+
+   \only<3>{
+    \begin{center}
+    \begin{small}
+    \rowcolors{1}{ZurichBlue!20}{ZurichBlue!5}
+    \begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|}
+    \multicolumn{3}{c}{\texttt{\textbf{C = xor(A,B)}}} \\ \toprule \hline
+   \textbf{A} & \textbf{B} & \textbf{C} \\ \hline
+    1 & 1 & 0 \\ \hline
+    1 & 0 & 1 \\ \hline
+    0 & 1 & 1 \\ \hline
+    0 & 0 & 0 \\ \hline
+    \end{tabular}
+    \end{small}
+    \end{center}}
+
+   \only<4>{
+    \begin{center}
+    \begin{small}
+    \rowcolors{1}{ZurichBlue!20}{ZurichBlue!5}
+    \begin{tabular}{|p{3cm}|p{3cm}|}
+    \multicolumn{2}{c}{\texttt{\textbf{C =$\sim$ A}}} \\ \toprule \hline
+   \textbf{A} & \textbf{C} \\ \hline
+    1 & 0 \\ \hline
+    0 & 1 \\ \hline
+    \end{tabular}
+    \end{small}
+    \end{center}}
+
+ \end{column}
+\end{columns}
+\end{frame}
+%%==================================================================F
+\begin{frame}[label=oper_prioridad,shrink=5]
+ \frametitle{Prioridad entre operadores}
+ \begin{center}
+ \begin{scriptsize}
+ \rowcolors{1}{ZurichBlue!20}{ZurichBlue!5}
+  \begin{tabular}{|l|c|l|}
+  \multicolumn{1}{c}{} & \multicolumn{1}{c}{} &
+       \multicolumn{1}{c}{\textbf{A igualdad prioridad...}} \\
+  \toprule \hline
+  Paréntesis, XOR & \texttt{(), xor()} & \\ \hline
+  No lógico & \texttt{$\sim$} & Derecha a izquierda \\ \hline
+  Potencia & \texttt{\^\ } & Izquierda a derecha \\ \hline
+  Multiplicación, división & \texttt{*,/} & Izquierda a derecha \\ \hline
+  Suma, resta, cambio de signo & \texttt{+,-} & Izquierda a derecha \\ \hline
+  Relacionales & \texttt{<, <=, >, >=} & Izquierda a derecha \\ \hline
+  Igualdad & \texttt{==, $\sim$=} & Izquierda a derecha \\ \hline
+  Y lógico & \texttt{\&} & Izquierda a derecha \\ \hline
+  O lógico & \texttt{|} & Izquierda a derecha \\ \hline
+  Asignación & \texttt{=} & Izquierda a derecha \\ \hline
+  \end{tabular}
+ \end{scriptsize}
+ \end{center}
+    Es mucho mejor hacer explícito el orden de las operaciones usando el
+    paréntesis: 
+  \begin{itemize}
+    \item \texttt{1 + 2 * 3 / 4 - 5}
+    \item \texttt{(1 + (2 * 3) / 4) - 5}            
+  \end{itemize}
+\end{frame}
+%%==================================================================F
+\subsection{Matrices}
+\begin{frame}[label=array_operaciones]
+ \frametitle{Matrices}
+ \begin{enumerate}
+  \item Suma y resta:
+    \begin{itemize}
+     \item \texttt{A+B}: Operación matricial elemento a elemento
+     \item \texttt{A+c}: Operación escalar. (Suma $c$ a cada elemento)
+    \end{itemize}
+  \item Producto:
+    \begin{itemize}
+     \item \texttt{A*B}: Operación matricial elemento a elemento
+     \item \texttt{A*c}: Operación escalar. (Multiplica $c$ a cada elemento)
+    \end{itemize}
+  \item Producto \alert{elemento a elemento}: \texttt{A.*B} $\Rightarrow
+    A_{ij}\cdot B_{ij}$
+  \item Potenciación: \texttt{A\^{}3} $\Rightarrow A^3=A\cdot A\cdot A$
+    (Producto matricial)
+  \item Potenciación \alert{elemento a elemento}:
+    \begin{itemize}
+     \item \texttt{A.\^{}3}: $\Rightarrow A_{ij}^3$
+     \item \texttt{A.\^{}B}: $\Rightarrow A_{ij}^{B_{ij}}$
+    \end{itemize}
+ \end{enumerate}
+\end{frame}
+%%==================================================================F
+\begin{frame}[label=array_operaciones2]
+ \frametitle{Matrices}
+ \begin{enumerate}
+  \item División:
+    \begin{itemize}
+     \item \texttt{A/c} Operación escalar. Divide entre $c$ cada elemento
+     \item \texttt{c/A} \alert{ERROR!}
+     \item \texttt{A/B} $\Leftrightarrow$ \texttt{A*inv(B)}
+     \item \texttt{A\textbackslash B} $\Leftrightarrow$ \texttt{inv(A)*B}
+    \end{itemize}
+  \item División elemento a elemento:
+    \begin{itemize}
+     \item \texttt{A./B} $\Rightarrow A_{ij}/B_{ij}$
+     \item \texttt{c./A} $\Rightarrow c/A_{ij}$
+    \end{itemize}
+  \item Traspuesta: \texttt{A'}
+ \end{enumerate}
+\end{frame}
+%%==================================================================F 
+\section{Programación en MATLAB}
+\begin{frame}[label=programacion]
+\frametitle{Programación}
+ \begin{enumerate}
+  \item Secuencia de comandos que se almacenan en un archivo
+  \item Se usa un editor de código (Matlab)
+  \item El programa se guardaría como \alert{\texttt{programa.m}} en el 'pwd'
+  \item El programa se ejecuta con \\\texttt{>> programa}
+  \item Los comentarios empiezan con el signo \texttt{
+      \%:\\\textcolor{Comentario}{\% Esto es un comentario}}
+ \end{enumerate}
+\end{frame}
+%%==================================================================F 
+\subsection{Bifurcaciones}
+\begin{frame}[label=bifuraciones,fragile]
+ \frametitle{Bifurcaciones}
+ \begin{itemize}
+    \item Ejecutar una parte de un programa si se cumple una \alert{condición}.
+    \item O ejecutar otra si no se cumple.
+ \end{itemize}
+ \defverbatim[colored]\lstI{
+   \begin{lstlisting}[style=mio]
+       if (condicion)
+        sentencias % Condicion verdadera
+       else
+        sentencias % Condicion falsa
+       end
+   \end{lstlisting}
+ }
+ \begin{small}
+  \lstI
+ \end{small}
+ \begin{itemize}
+    \item Cuando no hay que hacer nada si la expresión booleana es falsa, el
+      \alert{\texttt{else}} se puede obviar.
+ \end{itemize}
+\end{frame}
+%%==================================================================F
+\begin{frame}[label=bifuraciones_multiples,fragile]
+ \frametitle{Bifurcaciones múltiples}
+ \begin{itemize}
+    \item A veces se hace necesario considerar varias condiciones excluyentes,
+    \item y no tiene sentido crear un \alert{\texttt{if}} para cada condición.
+ \end{itemize}
+ \defverbatim[colored]\lstI{
+   \begin{lstlisting}[style=mio]
+      if (condicion 1)
+        sentencias
+      elseif (condicion 2)
+        sentencias
+      else
+        sentencias
+      end
+   \end{lstlisting}
+ }
+ \begin{small}
+  \lstI
+ \end{small}
+\end{frame}
+%%==================================================================F
+\begin{frame}[label=case,fragile]
+ \frametitle{Bifurcaciones múltiples}
+ \begin{itemize}
+    \item Cuando tenemos muchas condiciones posibles una opción puede ser
+      \alert{\texttt{switch-case}}.
+ \end{itemize}
+ \defverbatim[colored]\lstI{
+   \begin{lstlisting}[style=mio]
+      switch variable
+        case 'valor 1'
+          sentencias
+        case 'valor 2'
+          sentencias
+        ...
+        otherwise
+          sentencias
+      end
+ \end{lstlisting}
+ }
+ \begin{small}
+   \lstI
+ \end{small}
+\end{frame}
+%%==================================================================F
+\subsection{Iteraciones}
+\begin{frame}[label=iteraciones]
+ \frametitle{Iteraciones}
+ \begin{enumerate}
+  \item En muchas ocasiones querremos repetir las mismas instrucciones varias
+    veces (\alert{bucle}).
+  \item Un bucle \alert{\texttt{for}} itera sobre una lista (vector), y repite
+    los comandos un número determinado de veces.
+  \item Un bucle \alert{\texttt{while}} repite los comandos mientras se cumpla
+    una condición.
+  \item Cualquier bucle \alert{\texttt{for}} se puede transformar en un bucle
+    \alert{\texttt{while}}.
+ \end{enumerate}
+\end{frame}
+%%==================================================================F
+\begin{frame}[label=bucle_for,fragile]
+ \frametitle{Bucle \texttt{for}}
+ \begin{itemize}
+  \item \alert{\texttt{for}} Ejecuta el código un número de veces utilizando un
+    iterador o índice.
+ \defverbatim[colored]\lstI{
+  \begin{lstlisting}[style=mio]
+    for indice = valor_inicial:incremento:valor_final
+      sentencias
+     end
+ \end{lstlisting}
+ }
+ \begin{small}
+   \lstI
+ \end{small}
+  \item El índice se inicializa a \texttt{valor\_inicial} y se incrementa un
+    valor \texttt{incremento} hasta alcanzar el \texttt{valor\_final}
+  \item Si se omite \texttt{incremento} se asume que su valor es \texttt{1}.
+ \end{itemize}
+\end{frame}
+%%==================================================================F
+\begin{frame}[label=bucle_while,fragile]
+ \frametitle{Bucle \texttt{while}}
+ \begin{itemize}
+  \item \alert{\texttt{while}} Ejecuta el código hasta que una cierta condición
+    es \alert{falsa}.
+ %\begin{small}
+ \begin{verbatim}
+    while condicion
+      sentencias
+    end
+ \end{verbatim}
+ %\end{small}
+  \item \alert{¡OJO!} Cambiar la condición dentro del bucle puede causar
+    \alert{bucles infinitos}.
+ \end{itemize}
+\end{frame}
+%%==================================================================F
+\begin{frame}[label=break_continue]
+ \frametitle{Interrupción de iteraciones: \texttt{break} y \texttt{continue}}
+ \begin{itemize}
+  \item Puede ser necesario \alert{salir} de un bucle de manera abrupta.
+  \begin{itemize}
+   \item Podemos usar la instrucción \alert{\texttt{break}}.
+  \end{itemize}
+  \item En cualquier iteración, podemos \alert{“saltar”} directamente a la siguiente.
+  \begin{itemize}
+   \item Se usa la instrucción \alert{\texttt{continue}}.
+  \end{itemize}
+  \item Es también posible salir de una función o programa completo con
+    \alert{\texttt{return}}.
+  \item Siempre es mejor diseñar el bucle para que la salida sea una
+     consecuencia lógica del bucle.
+ \end{itemize}
+\end{frame}
+%%==================================================================F
+\begin{frame}[label=break,fragile]
+ \frametitle{Ejemplo de \texttt{break}}
+ \begin{itemize}
+  \item \alert{\texttt{break}} obliga a salir del bucle y continuar con la
+    ejecución del programa.
+   \defverbatim[colored]\lstI{
+     \begin{lstlisting}[style=mio]
+      ...
+      for i=1:100
+        if (i==11)
+          break;     % Finaliza el bucle
+        end
+        disp(i);
+      end
+      ...
+    \end{lstlisting}
+  }
+ \begin{small}
+  \lstI
+ \end{small}
+  \item El valor de i es \alert{\texttt{i=11}}.
+ \end{itemize}
+\end{frame}
+%%==================================================================F
+\begin{frame}[label=continue,fragile]
+ \frametitle{Ejemplo de \texttt{continue}}
+ \begin{itemize}
+  \item \alert{\texttt{continue}} obliga la finalización de esa repetición
+del bucle y comienza con la siguiente.
+ \begin{scriptsize}
+   \defverbatim[colored]\lstI{
+     \begin{lstlisting}[style=mio]
+      ...
+      for i=1:100
+        if (i==11)
+          continue;     % Continua con la siguiente iteracion
+        end
+        disp(i);
+      end
+      ...
+    \end{lstlisting}
+  }
+  \lstI
+ \end{scriptsize}
+  \item El valor de i es \alert{\texttt{i=100}}.
+ \end{itemize}
+\end{frame}
+%%==================================================================F
+\section{Funciones}
+%%==================================================================F
+\subsection{Definidas por el usuario}
+\begin{frame}[label=func_usuario]
+ \frametitle{Funciones definidas por el usuario}
+ \begin{itemize}
+  \item Hay que manejar tres conceptos básicos:
+  \begin{enumerate}
+   \item Argumentros de entrada.
+   \item Variables locales.
+   \item Argumentos de salida.
+  \end{enumerate}
+  \item Oculta los detalles del cálculo.
+  \item Facilita el diseño (concept \alert{top-down}).
+  \item Facilita entender un programa $\Rightarrow$ Más fácil de modificar en
+    el futuro o por otras personas.
+ \end{itemize}
+\end{frame}
+%%==================================================================F
+\begin{frame}[label=func_declaracion,fragile]
+ \frametitle{Declaración de una función}
+ \begin{itemize}
+  \item Para declarar una variable se utiliza la palabra clave    
+    \alert{\texttt{function}}
+  \item Por norma general, acabaremos la función con la palabra clave
+    \alert{\texttt{end}}
+  \item Es una buena praxis el comentar la función con un texto claro, conciso e
+    informativo
+ \end{itemize}
+   \defverbatim[colored]\lstI{
+     \begin{lstlisting}[style=mio]
+     function s = MiFuncion (E)
+        % La documentacion de las funciones se incluye
+        % justo despues de la cabecera.
+        % E: Argumentos de Entrada.
+        % s: Argumentos de salida.
+        ...
+     end
+    \end{lstlisting}
+  }
+ \begin{small}
+  \lstI
+ \end{small}
+\end{frame}
+%%==================================================================F
+\begin{frame}[label=func_ficheros]
+ \frametitle{Funciones en ficheros}
+ \begin{itemize}
+  \item Cada función se guarda en un fichero '\texttt{.m}'.
+  \item El nombre del fichero es igual que la función: \texttt{MiFuncion.m}
+  \item Si sólo hay una función dentro del fichero, se puede omitir
+    \alert{\texttt{end}} al final de la función.
+  \item Si hay varias funciones, sólo la primera queda visible fuera del
+    fichero.
+  \item La primera línea del fichero que no sea un comentario tiene que ser la
+    declaración de la función.
+  \item Para llamar a una función, tenemos que estar en el mismo directorio que
+    su fichero \texttt{funcion.m}.
+ \end{itemize}
+\end{frame}
+%%==================================================================F
+\begin{frame}[label=func_variables,shrink=1]
+ \frametitle{Variables locales y globales}
+ \begin{itemize}
+  \item Las variables \alert{locales} están definidas dentro del cuerpo de una
+    función y no son visibles fuera de él.
+  \item Las variables \alert{globales} son las que definimos fuera del cuerpo de
+    una función.
+  \item Si hay una variable local con el mismo nombre que una variable global,
+    la variable global ya no está disponible dentro de esa función.
+  \item Podemos crear una variable global desde dentro del cuerpo de una función
+    usando la palabra clave global: \\\hspace{15mm}\texttt{global m; m = 1;}
+  \item Es muy \alert{poco recomendable} crear variables globales dentro de
+    funciones.
+  \begin{itemize}
+    \item Lo que pasa en la función, queda dentro de la función \texttt{;-)}
+  \end{itemize}
+ \end{itemize}
+\end{frame}
+%%==================================================================F
+\begin{frame}[label=func_argumentos]
+ \frametitle{Argumentos de entrada y salida}
+ \begin{itemize}
+  \item Podemos utilizar tantos argumentos de entrada y salida como queramos.
+  \item Podemos especificar que algunos de los argumentos de nuestras funciones
+    sean opcionales.
+  \item Para saber cuántos argumentos se han pasado usamos   
+    \alert{\texttt{nargin}}.
+  \item Para saber cuántos argumentos de salida nos piden, usamos
+    \alert{\texttt{nargout}}.
+ \end{itemize}
+\end{frame}
+%%==================================================================F
+\subsection{Funciones de la librería de MATLAB}
+\begin{frame}[label=func_builtin,shrink=10]
+ \frametitle{Funciones matemáticas}
+ \begin{enumerate}
+  \item Cáculos básicos
+   \begin{itemize}
+    \item Valor absoluto: \texttt{abs(x)}
+    %\item Resto de la división: \texttt{rem(x,y)}
+    \item Raíz cuadrada: \alert{\texttt{sqrt(x)}}
+    \item Logaritmo neperiano: \texttt{log(x)}
+    \item Función exponencial: \alert{\texttt{exp(x)}}
+    \item Mayor entero menor o igual a x: \texttt{floor(x)}
+    \item Menor entero mayor o igual a x: \texttt{ceil(x)}
+    \item Redondea al entero más cercano: \texttt{round(x)}
+   \end{itemize}
+  \item Cálculo trigonométrico
+   \begin{itemize}
+    \item Seno y arcoseno: \texttt{\alert{sin(x)}, asin(x)}
+    \item Coseno y arcocoseno: \texttt{\alert{cos(x)}, acos(x)}
+    \item Tangente y arcotangente: \texttt{\alert{tan(x)}, atan(x),
+      \alert{atan2(x,y)}}
+    %\item Cotangente y arcocotangente: \texttt{cot(x), acot(x)}
+    %\item Secante y arcosecante: \texttt{csc(x), acsc(x)}
+    %\item Cosecante y arcocosecante: \texttt{sec(x), asec(x)}
+ \end{itemize}
+  \item Cálculo estadístico
+   \begin{itemize}
+    \item Media: \alert{\texttt{mean(x)}}
+    \item Desviación típica: \alert{\texttt{std(x)}}
+ \end{itemize}
+\end{enumerate}
+\end{frame}
+%%==================================================================F
+\subsubsection{Matrices}
+\begin{frame}[label=array_funciones,shrink=10]
+ \frametitle{Matrices}
+ \begin{itemize}
+  \item Producto escalar: \texttt{dot(u,v)}
+  \item Producto vectorial: \texttt{cross(u,v)}
+  \item Tamaño de un array o matriz: \texttt{length(v)}
+  \item Suma de componentes: \texttt{sum(v)}
+  \item Módulo: \texttt{norm(v)}
+  \item Inversa de una matriz: \texttt{Inv(A)}
+  \item Determinante: \texttt{det(A)}
+  \item Traza: \texttt{trace(A)}
+  \item Matriz identidad $I_n$: \alert{\texttt{eye(n)}}
+  \item Matriz de ceros: \texttt{zeros(m,n), zeros(n)}
+  \item Matriz de unos: \texttt{ones(m,n), ones(n)}
+  \item Generar matriz diagonal: \texttt{diag(v)}
+ \end{itemize}
+\end{frame}
+%%==================================================================F
+\begin{frame}[label=func_builtin2,shrink=5]
+ \frametitle{Descomposición de matrices}
+ \begin{enumerate}
+   \item Descomposición \alert{LU}: Descompone la matriz A en el producto
+      $A=L\cdot U$, siendo $L$ una matriz triangular inferior y $U$ una
+      triangular superior.
+      \\\hspace{1cm}\texttt{[L,U]=lu(A)}
+   \item Factorización de \alert{Cholesky}: Devuelve la matriz triangular
+      superior $R$ tal que $R'\cdot R=A$, siempre que A sea definida positiva.
+      \\\hspace{1cm}\texttt{R=chol(A)}
+   \item Descomposición \alert{ortogonal}: Devuelve la matriz triangular
+      superior $R$ de igual dimensión que $A$ y la matriz ortogonal $Q$ tal que
+      $A=Q\cdot R$.
+      \\\hspace{1cm}\texttt{[Q,R]=qr(A)}
+ \end{enumerate}
+\end{frame}
+%%==================================================================F
+\section{Entrada/Salida}
+\begin{frame}[label=io]
+ \frametitle{Entrada y salida de datos}
+ \begin{enumerate}
+   \item La entrada y salida más comunes son:
+   \begin{itemize}
+    \item Estándar.
+    \item De/a un fichero.
+   \end{itemize}
+   \item Se pueden introducir:
+   \begin{itemize}
+    \item Números.
+    \item Cadenas.
+    \item Vectores.
+    \item Matrices.
+   \end{itemize}
+ \end{enumerate}
+\end{frame}
+%%==================================================================F
+\subsection{E/S estándar}
+\begin{frame}[label=io_std]
+ \frametitle{Entrada y salida estándar}
+ \begin{enumerate}
+  \item Entrada:
+  \begin{itemize}
+   \item \texttt{variable = input('Mensaje para el usario')}
+   \item El resultado se procesa al presionar \alert{$<$enter$>$}
+   \item Para recoger una cadena: 
+   \begin{itemize}
+    \item \texttt{variable = input('Mensaje para el usario','s')}
+    \item Podemos pedir al usuario que escriba el valor entre comillas simples
+   \end{itemize}
+  \end{itemize}
+  \item Salida:
+  \begin{itemize}
+   \item Solución simple: \alert{no pongas} '\alert{\texttt{;}}'
+   \item Para enviar mensajes:
+   \begin{itemize}
+     \item \texttt{disp('Mensaje para el usario')}
+   \end{itemize}
+   \item Para mostrar variables:
+   \begin{itemize}
+     \item \texttt{disp(variable)}
+   \end{itemize}
+  \end{itemize}
+ \end{enumerate}
+\end{frame}
+%%==================================================================F
+\subsection{E/S con formato}
+\begin{frame}[label=salida_std]
+ \frametitle{Salida y entrada con formato}
+ \begin{enumerate}
+    \item Salida con formato:
+  \begin{itemize}
+    \item \alert{\texttt{printf(TEMPLATE, variables)}}: Salida estándar.
+    \item \alert{\texttt{sprintf}}: La salida es una cadena de caracteres.
+    \item \alert{\texttt{fprintf}$^*$}: La salida se realiza a un fichero
+  \end{itemize}
+  \item Entrada con formato:
+  \begin{itemize}
+    \item \alert{\texttt{scanf}}: Entrada estándar (no muy útil).
+    \item \alert{\texttt{sscanf}}: La entrada es una cadena de caracteres.
+    \item \alert{\texttt{fscanf}$^*$}: Toma la entrada de un fichero.
+  \end{itemize}
+  \item \alert{$^{*}$}Necesitan las funciones:
+  \begin{itemize}
+    \item Abrir archivo: \alert{\texttt{fopen}}
+    \item Cerrar archivo: \alert{\texttt{fclose}}
+  \end{itemize}
+ \end{enumerate}
+\end{frame}
+%%==================================================================F
+\begin{frame}[label=template]
+ \frametitle{\texttt{TEMPLATE}: Dando formato}
+ \begin{enumerate}
+  \item Formato de datos:
+  \begin{itemize}
+    \item Enteros, lógicos, reales con decimales cero: \alert{'\texttt{\%d}'}
+    \item Cualquier dato numérico con 6 decimales: \alert{'\texttt{\%f}'}
+    \item Escribe cadenas: \alert{'\texttt{\%s}'}
+  \end{itemize}
+  \item Caracteres de control:
+  \begin{itemize}
+    \item Salto de línea: \alert{\texttt{'\textbackslash n'}}
+    \item Retorno de carro: \texttt{'\textbackslash r'}
+    \item Tabulación: \alert{\texttt{'\textbackslash t'}}
+    \item Espacio hacia atrás: \texttt{'\textbackslash b'}
+  \end{itemize}
+ \end{enumerate}
+\end{frame}
+%%==================================================================F
+\subsection{Importar y Exportar}
+\begin{frame}[label=io_otras]
+ \frametitle{Otras salidas y entradas de datos}
+ \begin{enumerate}
+  \item Importar y exportar datos:
+  \begin{itemize}
+    \item Cargar datos formato \alert{Matlab} o en fichero \alert{ASCII}
+      delimitado por espacios: \alert{\texttt{load}}
+    \item Guardar datos formato \alert{Matlab} o en fichero \alert{ASCII}
+      delimitado por espacios: \alert{\texttt{save}}
+  \end{itemize}
+ \end{enumerate}
+\end{frame}
+%%==================================================================F
+\againframe{portada}
+%%==================================================================F
+
+%\section{Resumen}
