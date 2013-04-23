@@ -27,6 +27,7 @@
  \titlepage
 \end{frame}
 \begin{frame}[label=toc]
+  \frametitle{Resumen}
 \tableofcontents[hidesubsections]
 \end{frame}
 
@@ -91,7 +92,27 @@
  \frametitle{Importar como vectorial: \LARGE\path{v.in.ascii}}
 \end{frame}
 %%==================================================================Sb
-\subsection{Eliminando puntos groseros}
+\subsection{GRASS LiDAR tools}
+\begin{frame}
+  \frametitle{GRASS LiDAR tools}
+  Eliminación de objetos en nubes de puntos y creación de MDT's
+  \begin{minipage}{0.35\textwidth}
+  \begin{itemize}
+    \item<2-> \path{v.outlier}
+    \item<3-> \path{v.lidar.edgedetection}
+    \item<4-> \path{v.lidar.growing}
+    \item<5-> \path{v.lidar.correction}
+    \item<6-> \path{v.surf.bspline}
+  \end{itemize}
+  \end{minipage}
+  \begin{minipage}{0.65\textwidth}
+    \uncover<3->{\put{\includefigure{image/edge}}}
+    \uncover<4->{\put{\includefigure{image/grow}}}
+    \uncover<5->{\put{\includefigure{image/corr}}}
+  \end{minipage}
+\end{frame}
+%%==================================================================Sb
+\subsection{\path{v.outlier}}
 %%==================================================================F 
 \begin{frame}[fragile,shrink=5]
   \frametitle{\path{v.outlier}}
@@ -107,7 +128,7 @@
       \item \textbf{thres\_o}: Threshold for the outliers. (default: 50)
     \end{itemize}
   \end{beamerboxesrounded}
-  \pause
+  %\pause
   \begin{beamerboxesrounded}[shadow=true]{Sintaxis}
 \scriptsize
 %\testcode
@@ -119,7 +140,6 @@ GRASS6 (stuttgart): > # Limpiamos el ultimo impulso
 GRASS6 (stuttgart): > v.outlier in=stuttgart_last out=station_last \
 > outlier=station_last_out soe=10 son=10 thres_o=30
 \end{verbatim}
-
 \end{beamerboxesrounded}
 \end{frame}
 %%==================================================================F 
@@ -127,7 +147,7 @@ GRASS6 (stuttgart): > v.outlier in=stuttgart_last out=station_last \
  \frametitle{Visualización de \LARGE\path{v.outlier}}
 \end{frame}
 %%==================================================================Sb
-\subsection{Detección de borde de objetos}
+\subsection{\path{v.lidar.edgedetection}}
 %%==================================================================F 
 \begin{frame}[fragile,shrink=10]
   \frametitle{\path{v.lidar.edgedetection}}
@@ -146,7 +166,7 @@ GRASS6 (stuttgart): > v.outlier in=stuttgart_last out=station_last \
     \item \textbf{lambda\_r}: Regularization weight in residual evaluation (default: 2)
    \end{itemize}
   \end{beamerboxesrounded}
- \pause
+ %\pause
  \begin{beamerboxesrounded}[shadow=true]{Sintaxis}
 \scriptsize
 %\testcode
@@ -177,7 +197,7 @@ GRASS6 (stuttgart): > v.lidar.edgedetection in=station_last see=4 sen=4 \
 \end{columns}
 \end{frame}
 %%==================================================================Sb
-\subsection{Relleno de los límites de los objetos}
+\subsection{\path{v.lidar.growing}}
 %%==================================================================F 
 \begin{frame}[fragile,shrink=10]
   \frametitle{\path{v.lidar.growing}}
@@ -193,7 +213,7 @@ GRASS6 (stuttgart): > v.lidar.edgedetection in=station_last see=4 sen=4 \
          (default: 0.6)
     \end{itemize}
   \end{beamerboxesrounded}
-  \pause
+  %\pause
   \begin{beamerboxesrounded}[shadow=true]{Sintaxis}
 \scriptsize
 \begin{verbatim}
@@ -230,7 +250,7 @@ GRASS6 (stuttgart): > v.lidar.growing in=station_edge out=station_grow \
 \end{columns}
 \end{frame}
 %%==================================================================Sb
-\subsection{Corrección final}
+\subsection{\path{v.lidar.correction}}
 %%==================================================================F 
 \begin{frame}[fragile,shrink=5]
   \frametitle{\path{v.lidar.correction}}
@@ -248,7 +268,7 @@ GRASS6 (stuttgart): > v.lidar.growing in=station_edge out=station_grow \
      \item \textbf{tcl}: Low differnce threshold (object/terrain). (default 1)
     \end{itemize}
   \end{beamerboxesrounded}
-  \pause
+  %\pause
   \begin{beamerboxesrounded}[shadow=true]{Sintaxis}
 \scriptsize
 \begin{verbatim}
@@ -306,13 +326,6 @@ GRASS6 (stuttgart): > v.lidar.correction in=station_grow sce=60 scn=60 \
 	 \item Octave (\url{http://www.gnu.org/software/octave/})
 	\end{itemize}
     \end{enumerate}
-\end{frame}
-%%==================================================================F
-\begin{frame}[label=vista_ppal]
- \frametitle{Vista principal de MATLAB}
-  \begin{center}
-   \includegraphics[width=0.7\paperwidth ]{images/matlab_vista_ppal}
-  \end{center}
 \end{frame}
 %%==================================================================F 
 \section{Variables y tipos de datos}
@@ -486,17 +499,6 @@ GRASS6 (stuttgart): > v.lidar.correction in=station_grow sce=60 scn=60 \
     \hspace*{0.25cm} 2 \hspace*{0.25cm} 3 \\ \hspace*{0.5cm} 4 \hspace*{0.25cm}
     5 \hspace*{0.25cm} 6}
  \end{enumerate}
-\end{frame}
-%%==================================================================F
-\begin{frame}[label=cadenas]
- \frametitle{Cadenas de texto}
-   \begin{enumerate}
-    \item Se asignan con comillas simples: \texttt{s = '¡Hola, Mundo!'}
-    \item Se pueden editar en el \emph{workspace}
-   \end{enumerate}
-  \begin{center}
-   \includegraphics[height=3cm]{images/cadena_workspace}
-  \end{center}
 \end{frame}
 %%==================================================================F
 \section{Operadores}
