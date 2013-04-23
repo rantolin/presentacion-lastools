@@ -81,10 +81,21 @@
 
 %% PREFERENCIAS PARA LISTINGS (código)
 \lstdefinestyle{mio}{
-   tabsize=4,%
+   tabsize=2,%
    inputencoding=latin1,%
    extendedchars=true,%
    basicstyle=\ttfamily\small,%
+   keywordstyle=\bfseries,%
+   commentstyle=\itshape,%
+   breaklines=true,%
+   showstringspaces=false,
+   }
+\lstdefinestyle{shell}{
+   language=sh,
+   tabsize=4,%
+   inputencoding=latin1,%
+   extendedchars=true,%
+   basicstyle=\ttfamily\scriptsize,%
    keywordstyle=\bfseries,%
    commentstyle=\itshape,%
    breaklines=true,%
@@ -115,7 +126,11 @@ commentstyle=\color{fondoO!50!green}\itshape
   identifierstyle=\bfseries
 }
 
-\lstset{style=mio}
+\lstset{style=shell}
+\lstset{emph={%  
+    lasinfo, lasdiff, lasmerge, las2txt, txt2las, las2ogr%
+    },emphstyle={\bfseries}%
+}%
 
 %% DATOS DEL DOCUMENTO
 \title[FOSS para trabajar con LiDAR]

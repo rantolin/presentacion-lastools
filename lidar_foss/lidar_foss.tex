@@ -96,7 +96,7 @@
 \begin{frame}
   \frametitle{GRASS LiDAR tools}
   Eliminación de objetos en nubes de puntos y creación de MDT's
-  \begin{minipage}{0.35\textwidth}
+  \begin{minipage}{0.45\textwidth}
   \begin{itemize}
     \item<2-> \path{v.outlier}
     \item<3-> \path{v.lidar.edgedetection}
@@ -105,14 +105,16 @@
     \item<6-> \path{v.surf.bspline}
   \end{itemize}
   \end{minipage}
-  \begin{minipage}{0.65\textwidth}
-    \uncover<3->{\put{\includefigure{image/edge}}}
-    \uncover<4->{\put{\includefigure{image/grow}}}
-    \uncover<5->{\put{\includefigure{image/corr}}}
+  \begin{minipage}{0.45\textwidth}
+    \begin{picture}(275,110)
+    \uncover<3->{\put(0,0){\includegraphics[width=0.75\textwidth]{images/edge}}}
+    \uncover<4->{\put(10,-10){\includegraphics[width=0.75\textwidth]{images/grow}}}
+    \uncover<5->{\put(20,-20){\includegraphics[width=0.75\textwidth]{images/correction}}}
+    \end{picture}
   \end{minipage}
 \end{frame}
 %%==================================================================Sb
-\subsection{\path{v.outlier}}
+\subsection{\texttt{v.outlier}}
 %%==================================================================F 
 \begin{frame}[fragile,shrink=5]
   \frametitle{\path{v.outlier}}
@@ -142,12 +144,8 @@ GRASS6 (stuttgart): > v.outlier in=stuttgart_last out=station_last \
 \end{verbatim}
 \end{beamerboxesrounded}
 \end{frame}
-%%==================================================================F 
-\begin{frame}
- \frametitle{Visualización de \LARGE\path{v.outlier}}
-\end{frame}
 %%==================================================================Sb
-\subsection{\path{v.lidar.edgedetection}}
+\subsection{\texttt{v.lidar.edgedetection}}
 %%==================================================================F 
 \begin{frame}[fragile,shrink=10]
   \frametitle{\path{v.lidar.edgedetection}}
@@ -177,27 +175,27 @@ GRASS6 (stuttgart): > v.lidar.edgedetection in=station_last see=4 sen=4 \
 \end{beamerboxesrounded}
 \end{frame}
 %%==================================================================F 
-\pgfdeclareimage[width=0.65\textwidth]{edge}{images/edge}
-\begin{frame}
- \frametitle{Visualización de \LARGE\path{v.lidar.edgedetection}}
-\begin{columns}
-  \begin{column}{0.7\textwidth}
-    \begin{center}
-	\begin{tikzpicture}
-    	  \pgftext[bottom,left,at={\pgfpointxy{0}{0}}]{\pgfuseimage{edge}}
-	\end{tikzpicture}
-   \end{center}
-  \end{column}
-  \begin{column}{0.25\textwidth}
-	\begin{enumerate}
-	 \item \textcolor{red}{Borde}
-	 \item \textcolor{yellow!95!black}{Terreno}
-	\end{enumerate}
-  \end{column}
-\end{columns}
-\end{frame}
+%\pgfdeclareimage[width=0.65\textwidth]{edge}{images/edge}
+%\begin{frame}
+% \frametitle{Visualización de \LARGE\path{v.lidar.edgedetection}}
+%\begin{columns}
+%  \begin{column}{0.7\textwidth}
+%    \begin{center}
+%	\begin{tikzpicture}
+%    	  \pgftext[bottom,left,at={\pgfpointxy{0}{0}}]{\pgfuseimage{edge}}
+%	\end{tikzpicture}
+%   \end{center}
+%  \end{column}
+%  \begin{column}{0.25\textwidth}
+%	\begin{enumerate}
+%	 \item \textcolor{red}{Borde}
+%	 \item \textcolor{yellow!95!black}{Terreno}
+%	\end{enumerate}
+%  \end{column}
+%\end{columns}
+%\end{frame}
 %%==================================================================Sb
-\subsection{\path{v.lidar.growing}}
+\subsection{\texttt{v.lidar.growing}}
 %%==================================================================F 
 \begin{frame}[fragile,shrink=10]
   \frametitle{\path{v.lidar.growing}}
@@ -228,29 +226,29 @@ GRASS6 (stuttgart): > v.lidar.growing in=station_edge out=station_grow \
 \end{itemize}
 \end{frame}
 %%==================================================================F 
-\pgfdeclareimage[width=0.65\textwidth]{grow}{images/grow}
-\begin{frame}
- \frametitle{Visualización de \LARGE\path{v.lidar.growing}}
-\begin{columns}
-  \begin{column}{0.65\textwidth}
-    \begin{center}
-	\begin{tikzpicture}
-    	  \pgftext[bottom,left,at={\pgfpointxy{0}{0}}]{\pgfuseimage{grow}}
-	\end{tikzpicture}
-   \end{center}
-  \end{column}
-  \begin{column}{0.35\textwidth}
-	\begin{enumerate}
-	 \item \textcolor{yellow!95!black}{Terreno}
-	 \item \textcolor{green}{Terreno doble eco}
-	 \item \textcolor{blue!90!black}{Objeto doble eco}
-	 \item \textcolor{red}{Objeto}
-	\end{enumerate}
-  \end{column}
-\end{columns}
-\end{frame}
+%\pgfdeclareimage[width=0.65\textwidth]{grow}{images/grow}
+%\begin{frame}
+% \frametitle{Visualización de \LARGE\path{v.lidar.growing}}
+%\begin{columns}
+%  \begin{column}{0.65\textwidth}
+%    \begin{center}
+%	\begin{tikzpicture}
+%    	  \pgftext[bottom,left,at={\pgfpointxy{0}{0}}]{\pgfuseimage{grow}}
+%	\end{tikzpicture}
+%   \end{center}
+%  \end{column}
+%  \begin{column}{0.35\textwidth}
+%	\begin{enumerate}
+%	 \item \textcolor{yellow!95!black}{Terreno}
+%	 \item \textcolor{green}{Terreno doble eco}
+%	 \item \textcolor{blue!90!black}{Objeto doble eco}
+%	 \item \textcolor{red}{Objeto}
+%	\end{enumerate}
+%  \end{column}
+%\end{columns}
+%\end{frame}
 %%==================================================================Sb
-\subsection{\path{v.lidar.correction}}
+\subsection{\texttt{v.lidar.correction}}
 %%==================================================================F 
 \begin{frame}[fragile,shrink=5]
   \frametitle{\path{v.lidar.correction}}
@@ -278,29 +276,120 @@ GRASS6 (stuttgart): > v.lidar.correction in=station_grow sce=60 scn=60 \
   \end{beamerboxesrounded}
 \end{frame}
 %%==================================================================F 
-\pgfdeclareimage[width=0.65\textwidth]{corr}{images/correction}
+%\pgfdeclareimage[width=0.65\textwidth]{corr}{images/correction}
+%\begin{frame}
+% \frametitle{Visualización de \LARGE\path{v.lidar.correction}}
+%\begin{columns}
+%  \begin{column}{0.65\textwidth}
+%    \begin{center}
+%	\begin{tikzpicture}
+%    	  \pgftext[bottom,left,at={\pgfpointxy{0}{0}}]{\pgfuseimage{corr}}
+%	\end{tikzpicture}
+%   \end{center}
+%  \end{column}
+%  \begin{column}{0.35\textwidth}
+%	\begin{enumerate}
+%	 \item \textcolor{yellow!95!black}{Terreno}
+%	 \item \textcolor{green}{Terreno doble eco}
+%	 \item \textcolor{blue!90!black}{Objeto doble eco}
+%	 \item \textcolor{red}{Objeto}
+%	\end{enumerate}
+%  \end{column}
+%\end{columns}
+%\end{frame}
+%%==================================================================S INTRODUCTION
+\section{LAStools}
+%%==================================================================F 
 \begin{frame}
- \frametitle{Visualización de \LARGE\path{v.lidar.correction}}
-\begin{columns}
-  \begin{column}{0.65\textwidth}
-    \begin{center}
-	\begin{tikzpicture}
-    	  \pgftext[bottom,left,at={\pgfpointxy{0}{0}}]{\pgfuseimage{corr}}
-	\end{tikzpicture}
-   \end{center}
-  \end{column}
-  \begin{column}{0.35\textwidth}
-	\begin{enumerate}
-	 \item \textcolor{yellow!95!black}{Terreno}
-	 \item \textcolor{green}{Terreno doble eco}
-	 \item \textcolor{blue!90!black}{Objeto doble eco}
-	 \item \textcolor{red}{Objeto}
-	\end{enumerate}
-  \end{column}
-\end{columns}
+  \frametitle{LAStools}
+  \begin{enumerate}
+    \item Librería para la \alert{lectura} y \alert{escritura} de archivos en el
+      estándar ASPRS LAS en C++
+    \item Comandos para gestionar, manipular, transformar y procesar datos LiDAR
+      en formato LAS
+    \item \alert{LAStools.zip}
+      \begin{itemize}
+        \item lasground.exe, lasheight.exe, lasclassify.exe, lasoverlap.exe,
+          lascontrol.exe, lasgrid.exe, lastile.exe, lassort.exe, Lasclip.exe,
+          lasinfo.exe, lasindex.exe, lasthin.exe, las2las.exe, lasboundary.exe,
+          lasduplicate.exe, las2tin.exe,las2dem.exe, las2iso.exe, lasmerge.exe,
+          lassplit.exe, lasprecision.exe, las2shp.exe, shp2las.exe, lasview.exe,
+          laszip.exe, las2txt.exe, txt2las.exe
+        \item las2las.cpp, las2txt.cpp, lasdiff.cpp, lasindex.cpp, lasinfo.cpp,
+          lasmerge.cpp, lasprecision.cpp, laszip,cpp, txt2las.cpp
+      \end{itemize}
+  \end{enumerate}
 \end{frame}
-
-
+%%==================================================================F 
+\begin{frame}
+  \frametitle{LASzip}
+  \begin{enumerate}
+    \item Compresión de archivos .LAS sin \alert{pérdida}
+    \item 7\% - 20\% del tamaño del archivo original
+    \item Ganador del premio Geospatial World Forum 2012 Technology 
+      Innovation Award para el procesado de datos LiDAR
+    \item Incorporado en: LAStools, Global Mapper, Opals (TU Wien)...
+    \item Utilizado por: NOAA, USGS, Fugro, Blom, Riegl, Dielmo...
+    \item \alert{laszip}
+      \begin{itemize}
+        \item laszip lidar.las lidar.laz
+        \item Laszip lidar.laz lidar\_copy.las
+      \end{itemize}
+  \end{enumerate}
+\end{frame}
+%%==================================================================F 
+\begin{frame}[fragile]
+  \frametitle{LibLAS}
+  \defverbatim[colored]\gestion{
+     \begin{lstlisting}[style=shell]
+        $ for lasinfo lidar.las
+        $ lasdiff lidar1.las lidar2.las
+        $ lasmerge -i in1.las -i in2.las -i in3.las -o out.las
+    \end{lstlisting}
+  }
+  \defverbatim[colored]\formato{
+     \begin{lstlisting}[style=shell]
+        $ las2txt -i lidar.las -o lidar.txt -parse xyzi
+        $ txt2las -i lidar.taxyz -o lidar.las -parse xyzsi
+        $ las2ogr -i mydata.las -o points.shp -f "ESRI Shapefile"
+    \end{lstlisting}
+  }
+  Comandos (basados en LASTools) para gestionar, manipular, 
+    transformar y procesar datos LiDAR en formato LAS
+    \begin{itemize}
+      \item Gestionar
+        \gestion
+      \item Cambio de formato
+        \formato
+    \end{itemize}
+\end{frame}
+%%==================================================================F 
+\begin{frame}[fragile]
+  \frametitle{LibLAS}
+  \begin{enumerate}
+    \item Librería para la \alert{lectura} y \alert{escritura} de archivos en el estándar \alert{ASPRS LAS}
+    \item Compilable
+    \begin{itemize}
+      \item C/C++
+      \item Bindings: \alert{python}, C\#, VB.NET, Ironpython\ldots
+  %\defverbatim[colored]\liblas{
+    \begin{lstlisting}[style=mio]
+        >>> from liblas import file
+        >>> f = file.File('file.las',mode='r')
+        >>> for p in f:
+        ...     print 'X,Y,Z: ', p.x, p.y, p.z
+    \end{lstlisting}
+  %}
+        %\liblas
+    \end{itemize}
+    \item Paquetes
+    \begin{itemize}
+      \item \alert{OSGeo4W}
+      \item DebianGIS
+    \end{itemize}
+  \end{enumerate}
+\end{frame}
+%%==================================================================F 
 
 
 
