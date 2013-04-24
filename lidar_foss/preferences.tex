@@ -21,6 +21,9 @@
 \usepackage{float}
 \usepackage{listings}
 
+\usepackage{lmodern} % Familia de fuentes para que ttfamily tenga bfseries
+%\renewcommand*\familydefault{\ttdefault} %% Only if the base font of the document is to be typewriter style
+
 %% TEMAS BASE
 \usetheme{Boadilla}
 \setbeamertemplate{headline}{
@@ -81,26 +84,30 @@
 
 %% PREFERENCIAS PARA LISTINGS (código)
 \lstdefinestyle{mio}{
-   tabsize=2,%
-   inputencoding=latin1,%
-   extendedchars=true,%
-   basicstyle=\ttfamily\small,%
-   keywordstyle=\bfseries,%
-   commentstyle=\itshape,%
-   breaklines=true,%
-   showstringspaces=false,
+   basicstyle=\ttfamily\scriptsize,%
+   keywordstyle=\bfseries\color{ZurichBlue},%
+   commentstyle=\itshape\color{green},%
+   stringstyle=\color{red!50!black},
    }
 \lstdefinestyle{shell}{
    language=sh,
-   tabsize=4,%
-   inputencoding=latin1,%
-   extendedchars=true,%
    basicstyle=\ttfamily\scriptsize,%
-   keywordstyle=\bfseries,%
-   commentstyle=\itshape,%
-   breaklines=true,%
-   showstringspaces=false,
+   morekeywords={lasinfo,lasdiff,lasmerge,las2txt,txt2las,las2ogr,laszip},
+   keywordstyle=\bfseries\color{ZurichBlue},
+   commentstyle=\itshape\color{green},%
    }
+
+\lstdefinestyle{grass}{
+   language=sh,
+   basicstyle=\ttfamily\scriptsize,%
+   morekeywords={v.lidar.edgedetection,v.lidar.growing,
+        v.lidar.correction,v.surf.bspline,v.outlier},
+   keywordstyle=\bfseries\color{ZurichBlue},classoffset=1,
+   commentstyle=\itshape\color{green},%
+   morekeywords={GRASS6 (stuttgart):, >}
+   keywordstyle=\color{green!50!black}, classoffset=0
+   }
+
 \lstdefinestyle{latex}
 {
 language={[latex]tex},
@@ -126,11 +133,13 @@ commentstyle=\color{fondoO!50!green}\itshape
   identifierstyle=\bfseries
 }
 
-\lstset{style=shell}
-\lstset{emph={%  
-    lasinfo, lasdiff, lasmerge, las2txt, txt2las, las2ogr%
-    },emphstyle={\bfseries}%
-}%
+\lstset{style=mio,
+   tabsize=4,%
+   inputencoding=latin1,%
+   extendedchars=true,%
+   breaklines=true,%
+   showstringspaces=false,
+   backgroundcolor=\color{gray!20!white}}
 
 %% DATOS DEL DOCUMENTO
 \title[FOSS para trabajar con LiDAR]
