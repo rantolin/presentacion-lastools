@@ -339,6 +339,31 @@ GRASS6 (stuttgart): > v.lidar.correction in=station_grow sce=60 scn=60 \
   \end{enumerate}
 \end{frame}
 %%==================================================================F 
+\begin{frame}
+  \frametitle{Historia}
+  \begin{enumerate}
+    \item Inicio del desarrollo en Enero de 2007
+      \begin{itemize}
+        \item API para lectura/escritura de LAS
+        \item lasinfo, lasview, last2txt, txt2las, laszip, las2las
+      \end{itemize}
+    \item Publica desde Abril de 2007
+    \item Aparece libLAS como un \emph{fork} en Diciembre de 2007
+    \item Comercializada desde 2010
+      \begin{itemize}
+        \item GUI + multi-procesador en 2011
+        \item ArcGIS toolbox desde Abril de 2012
+      \end{itemize}
+    \item En internet
+      \begin{itemize}
+        \item \beamergotobutton{\url{http://groups.google.com/group/lastools}}
+        \item \beamergotobutton{\url{http://facebook.com/lastools}}
+        \item \beamergotobutton{\url{http://twitter.com/lastools}}
+        \item \beamergotobutton{\url{http://www.linkedin.com/groups?gid=4408378}}
+      \end{itemize}
+  \end{enumerate}
+\end{frame}
+%%==================================================================F 
   \defverbatim[colored]\laszip{
      \begin{lstlisting}[style=shell]
         $ laszip lidar.las lidar.laz
@@ -435,8 +460,8 @@ GRASS6 (stuttgart): > v.lidar.correction in=station_grow sce=60 scn=60 \
     \item \beamergotobutton{\url{http://pointclouds.org/}}
     \item \alert{¡NO CONFUNDIR CON PDAL!}
   \end{enumerate}
-    \begin{picture}(275,110)
-    \put(20,-20){\includegraphics[width=0.5\textwidth]{images/mug}}
+    \begin{picture}(350,90)
+    \put(180,0){\includegraphics[width=0.45\textwidth]{images/mug}}
     \end{picture}
 \end{frame}
 %%==================================================================F 
@@ -456,7 +481,90 @@ GRASS6 (stuttgart): > v.lidar.correction in=station_grow sce=60 scn=60 \
   \end{enumerate}
 \end{frame}
 %%==================================================================F 
-
+\begin{frame}
+  \frametitle{Descarga de .LAZ}
+  \begin{minipage}{0.35\textwidth}
+  \begin{enumerate}[<+->]
+    \item Open Topography
+    \item Minnesota DNR
+  \end{enumerate}
+  \end{minipage}
+    \begin{picture}(375,120)
+    \uncover<1->{\put(170,-10){\includegraphics[width=0.48\textwidth]{images/open_topo}}}
+    \uncover<2->{\put(170,-10){\includegraphics[width=0.48\textwidth]{images/minnesota}}}
+    \uncover<3->{\put(170,-10){\includegraphics[width=0.48\textwidth]{images/minnesota_martin}}}
+    \uncover<4->{\put(170,-10){\includegraphics[width=0.48\textwidth]{images/minnesota_laz}}}
+    \end{picture}
+\end{frame}
+%%==================================================================S 
+\section{Procesamiento con LAStools}
+%%==================================================================Sb
+\subsection{Control de Calidad}
+%%==================================================================F
+  \defverbatim[colored]\calidad{
+    \begin{lstlisting}[language=bash,style=shell]
+C:\> # Resumen de todo el contenido de los archvios LAS
+C:\> lasinfo -i *.las -compute_density
+C:\> # Inspeccion visual de los LAS
+C:\> lasview -i *.las 
+C:\> # Calcular el contorno y los huecos del vuelo LiDAR
+C:\> lasboundary  -i *.las  -holes  -disjoint  -oshp
+C:\> # Crear una malla con la densidad puntual y visualizarla en falso color
+C:\> lasgrid -i *.las  -density  -step 3  -set_minmax 0 20 -false  -opng  -utm 28N
+C:\> # Determinar si existen puntos repetidos
+C:\> lasduplicate  -i *.las  -unique_xyz  -onil
+C:\> # Comprobar la alineacion vertical y horizontal de las pasadas
+C:\> lasoverlap  -i *.las  -step 3
+    \end{lstlisting}
+  }
+\begin{frame}
+  \frametitle{Control de Calidad}
+\calidad
+\end{frame}
+%%==================================================================F
+  \defverbatim[colored]\preparacion{
+    \begin{lstlisting}[language=bash,style=shell]
+C:\> # Mejora de los datos y reproyeccion
+C:\> las2las  -i *.las -rescale 0.01 0.01 0.01  -utm 28N  -olaz  -odix  l
+C:\> # Unir todos los archivos y dividir los datos en teselas
+C:\> lastile -i *l.laz  -tile_size 500  -buffer 30  -olaz  -o tiles
+C:\> # Clasificar puntos terreno (class 2)
+C:\> lasground  -i tiles*.laz  -fine  -olaz  -odix g
+C:\> # Calcular la altura de los objetos respecto al terreno
+C:\> lasheight  -i tiles*g.laz  -olaz  -odix h
+C:\> # Clasificar los puntos no-terreno en edificios
+C:\> # (class 6) y vegetacion (class 5)
+C:\> lasclassify  -i tiles*gh.laz  -olaz  -odix c
+C:\> # Calcular la altura de los objetos y 
+C:\> # reemplazar la anterior
+C:\> lasheight  -i tiles*ghc.laz  -replace_z  -olaz  -odix h
+    \end{lstlisting}
+  }
+\begin{frame}
+  \frametitle{Preparación de los datos}
+\preparacion
+\end{frame}
+%%==================================================================F
+  \defverbatim[colored]\derivados{
+    \begin{lstlisting}[language=bash,style=shell]
+C:\> # Triangular puntos en un TIN y un raster (DSM)
+C:\> las2dem  -i tiles*.laz  -first_only  -step 2.5  -use_tile_bb  -otif
+C:\> # Triangular puntos en un TIN y un raster (DTM)
+C:\> las2dem  -i tiles*g.laz  -keep_class 2  -step 2.5  -use_tile_bb  -ocut 1  -otif
+C:\> # Encontrar la altura maxima en cada celda y exportar a PNG
+C:\> lasgrid  -i tiles*ghch.laz  -step 2.5  -use_tile_bb  -highest -false  -ocut 4  -opng
+C:\> # Estimar la densidad de la vegetacion baja, media y alta
+C:\> # contando los puntos por celda que caen en diferentes 
+C:\> # intervalos de altura: 30cm-99cm; 1m-1.99m; 2m-3.99m
+C:\> lasgrid  -i tiles*ghch.laz  -step 2.5  -clip_z 0.3 0.99  -density  -odix low  -oasc
+C:\> lasgrid  -i tiles*ghch.laz  -step 2.5  -clip_z 1.0 1.99  -density  -odix mid1  -oasc
+C:\> lasgrid  -i tiles*ghch.laz  -step 2.5  -clip_z 2.0 3.99  -density  -odix mid2  -oasc
+    \end{lstlisting}
+  }
+\begin{frame}
+  \frametitle{Cartografía derivada: Estudios Forestales}
+\derivados
+\end{frame}
 
 
 %%==================================================================F
