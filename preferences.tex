@@ -4,6 +4,8 @@
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{amssymb}
+\usepackage{amsfonts}   
+\usepackage{pifont}     % Para tickYes y tickNo
 \usepackage{graphicx}
 \usepackage{epsfig}
 \usepackage{pdflscape}
@@ -21,18 +23,51 @@
 \usepackage{float}
 \usepackage{listings}
 
-\usepackage{lmodern} % Familia de fuentes para que ttfamily tenga bfseries
-%\renewcommand*\familydefault{\ttdefault} %% Only if the base font of the document is to be typewriter style
+%% CONFIGURACIÓN DE TIKZ
+% Librerías cargadas
+\usetikzlibrary{arrows}
+%\usetikzlibrary{calc,fadings,decorations.pathreplacing,arrows,intersections,
+%    decorations.markings,external,shapes}
+
+% Configuración de Tikz y Pgfplot
+\tikzset{%
+    >=stealth, % option for nice arrows
+    inner sep=0pt,%
+    outer sep=3pt,%
+    mark coordinate/.style={inner sep=0pt,outer
+    sep=0pt,minimum size=3pt,
+    fill=black,circle}%
+    }
+
+% Librerías de tiKz
+    %\usetikzlibrary{}
+
+    % Define block styles
+\tikzstyle{io} = [trapezium,trapezium left angle=70,trapezium right angle=-70,
+  minimum height=0.9cm, draw, fill=blue!20, text width=4.5em, 
+  text badly centered, node distance=2cm, inner sep=0pt]
+\tikzstyle{decision} = [diamond, draw, fill=blue!20, text width=5.5em, 
+  text badly centered, node distance=2cm, inner sep=0pt]
+\tikzstyle{block} = [rectangle, draw, fill=blue!20, text width=5em, 
+  text centered, rounded corners, minimum height=4em]
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=2cm, 
+    minimum height=2em]
+
 
 %% TEMAS BASE
-\usetheme{Boadilla}
-\setbeamertemplate{headline}{
-\begin{beamercolorbox}{section in head/foot}
-\vskip2pt\insertnavigation{\paperwidth}\vskip2pt
-\end{beamercolorbox}
-\includegraphics[width=\paperwidth]{images/ucm_logo}}
+\usefonttheme{structurebold}
+\usecolortheme{orchid}
+\usetheme[hideothersubsections,left,width=.13\textwidth]{Goettingen}
 
-\usecolortheme{lily}
+% \usetheme{Boadilla}
+% \setbeamertemplate{headline}{
+%   \begin{beamercolorbox}{section in head/foot}
+%   \vskip2pt\insertnavigation{\paperwidth}\vskip2pt
+%   \end{beamercolorbox}
+%   \includegraphics[width=\paperwidth]{images/ucm_logo}
+% }
+% \usecolortheme{lily}
 
 \useinnertheme{circles}
 
@@ -42,13 +77,13 @@
 
 %% CONFIGURACIÓN GEENERAL DE HIPERVÍNCULOS
 \hypersetup{%
-    baseurl={roberto.antolin@mat.ucm.es},
-    pdftitle={FOSS para trabajar con LiDAR},%
+    baseurl={roberto.antolin@forestry.gsi.gov.uk},
+    pdftitle={LiDAR},%
     pdfauthor={Roberto Antol\'{i}n S\'anchez},%
     pdfcreator={Roberto Antol\'{i}n S\'anchez},%
     pdfproducer=PDFLaTeX,%
-    pdfsubject={FOSS for LiDAR},%
-    pdfkeywords={FOSS, GFOSS, LiDAR, GRASS, LibLAS, LAStools}%
+    pdfsubject={LiDAR data processing with LASTools},%
+    pdfkeywords={LASTools, LiDAR data, LASzip}%
   }
 
 \mode<presentation>{\hypersetup{pdfpagemode=FullScreen}}
@@ -80,35 +115,16 @@
 \newcommand{\web}{\extr{web}}
 \newcommand{\software}{\extr{software}}
 \newcommand{\hardware}{\extr{hardware}}
-\newcommand{\marca}{\ding{52}}
+\newcommand{\tickNo}{\color{red}\ding{55}}
+\newcommand{\tickYes}{\color{green!50!black}\checkmark}
 
 %% PREFERENCIAS PARA LISTINGS (código)
 \lstdefinestyle{mio}{
-   basicstyle=\ttfamily\scriptsize,%
-   keywordstyle=\bfseries\color{ZurichBlue},%
-   commentstyle=\itshape\color{green},%
-   stringstyle=\color{red!50!black},
-   }
-\lstdefinestyle{shell}{
-   language=sh,
-   basicstyle=\ttfamily\scriptsize,%
-   morekeywords={lasinfo,lasdiff,lasmerge,las2txt,txt2las,las2ogr,laszip,
-    lasview, lasboundary, lasgrid, lasduplicate, lasoverlap, las2dem,
-    las2las, lastile, lasground, lasheight, lasclassify},
-   keywordstyle=\bfseries\color{ZurichBlue},
-   commentstyle=\color{green!35!black}%
-   }
-
-\lstdefinestyle{grass}{
-   language=sh,
-   basicstyle=\ttfamily\scriptsize,%
-   morekeywords={v.lidar.edgedetection,v.lidar.growing,
-        v.lidar.correction,v.surf.bspline,v.outlier},
-   keywordstyle=\bfseries\color{ZurichBlue},classoffset=1,
-   commentstyle=\itshape\color{green!75!black},%
-   morekeywords={GRASS6 (stuttgart):, >}
-   keywordstyle=\color{green!50!black}, classoffset=0
-   }
+  basicstyle=\ttfamily\scriptsize,%
+  keywordstyle=\bfseries\color{ZurichBlue},%
+  commentstyle=shape\color{green},%
+  stringstyle=\color{red!50!black},
+}
 
 \lstdefinestyle{latex}
 {
@@ -117,14 +133,28 @@ keywordstyle=\color{resalta!50!black},
 commentstyle=\color{fondoO!50!green}\itshape
 }
 
-\lstdefinestyle{SQL}{
-    language=SQL,
-    basicstyle=\ttfamily\footnotesize,%
-    keywordstyle=\color{red}\bfseries,%
-    commentstyle=\color{green!50!black}\itshape,%
-    backgroundcolor=\color{gray!20!white}
-    }
+\lstdefinestyle{shell}{
+  language=sh,
+  basicstyle=\ttfamily\scriptsize,%
+  morekeywords={lasinfo,lasdiff,lasmerge,las2txt,txt2las,las2ogr,laszip,
+    lasview, lasboundary, lasgrid, lasduplicate, lasoverlap,
+    las2dem, las2las, lastile, lasground, lasheight, lasclassify},
+  keywordstyle=\bfseries\color{ZurichBlue},
+  commentstyle=\color{green!35!black}%
+}
 
+\lstdefinestyle{grass}{                                                                     
+  language=sh,
+  basicstyle=\ttfamily\scriptsize,%
+  morekeywords={v.lidar.edgedetection,v.lidar.growing,
+  v.lidar.correction,v.surf.bspline,v.outlier},
+  keywordstyle=\bfseries\color{ZurichBlue},classoffset=1,
+  commentstyle=shape\color{green!75!black},%
+  morekeywords={GRASS6 (stuttgart):, >}
+  keywordstyle=\color{green!50!black}, classoffset=0
+}
+
+%
 \lstdefinestyle{matlab}{
   basicstyle=\scriptsize\ttfamily,
   breaklines=true,
@@ -137,29 +167,30 @@ commentstyle=\color{fondoO!50!green}\itshape
 
 \lstset{style=mio,
    tabsize=4,%
-   inputencoding=latin1,%
+   inputencoding=utf8,%latin1,%
    extendedchars=true,%
    breaklines=true,%
    showstringspaces=false,
-   backgroundcolor=\color{gray!20!white}}
+   backgroundcolor=\color{gray!20!white}
+   }
 
 %% DATOS DEL DOCUMENTO
-\title[FOSS para trabajar con LiDAR]
-      {Software Libre y Abierto para trabajar con datos LiDAR}
+\title[LASTools]
+    {Procesamiento LiDAR: LASTools y LASzip}
 
 \author[R. Antolín]
     {Roberto Antolín Sánchez}
 
-\institute[UCM]{
-	Sec. Dptal. Astronomía y Geodesia\\
-        Facultad de CC. Matemáticas (UCM)\\
-	Plaza de Ciencias, 3\\
-	Madrid -- 28040\\
-	\texttt{roberto.antolin@mat.ucm.es}\\
+\institute[FR]{
+  Investigador y desarrollador \\
+  Forest Research \\
+  Northern Research Station \\
+  Roslin EH25 9SY \\
+  \texttt{roberto.antolin@forestry.gsi.gov.uk}\\
 }
 
 %% FECHA DE LA PRESENTACIÓN
-\date[06-05-2013]{6 de Mayo de 2013}
+\date[15-03-2014]{15 de Marzo de 2014}
 
 \AtBeginSection[]
 {
@@ -173,5 +204,6 @@ commentstyle=\color{fondoO!50!green}\itshape
 %\includeonlyframes{cc}
 %intro3,intro4,funciona,ventajas1,ventajas2,ventajas3
 %desventajas,miktex,miktex2,editores,otrasherr
-\input{lidar_foss.tex}
+%\input{filtro}
+\input{filtro}
 \end{document}
