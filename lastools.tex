@@ -185,7 +185,31 @@ C:\> lasgrid  -i tiles*ghch.laz  -step 2.5  -clip_z 2.0 3.99  -density  -odix mi
   \frametitle{Cartografía derivada: Estudios Forestales}
 \derivados
 \end{frame}
-
+%%==================================================================F
+  \defverbatim[colored]\derivados{
+    \begin{lstlisting}[language=bash,style=shell]
+C:\> # Generar un DTM sin errores de borde
+C:\> # Crear una carpeta llamada 'lastools/bin/tiles'
+C:\> las2dem -i tiles_classified\fitch*.laz -keep_class 2 -thin_with_grid 0.5 -extra_pass -use_tile_bb -odir tiles_dtm -obil -cores 4
+C:\> # Generar un DSM sin errores de borde
+C:\> las2dem -i tiles_classified\fitch*.laz -first_only -thin_with_grid 0.5 -extra_pass -use_tile_bb -odir tiles_dsm -obil -cores 4
+C:\> # Visualizar lo datos
+C:\> lasview -i tiles_dsm\fitch*.bil -gui
+C:\> # Crear el mosaico 
+C:\> lasgrid -i tiles_dsm\fitch*.bil -merge -utm 19N -vertical_navd88 -o dsm.tif
+C:\> # Crear el mosaico de manera directa
+C:\> blast2dem -i tiles_dtm\fitch*.bil -merged -hillshade -utm 19N -vertical_navd88 -o dtm_hillshade_raster.png
+C:\> # Crear un mapa de curvas de nivel de manera directa
+C:\> blast2iso -i tiles_dtm\fitch*.bil -merged -iso_every 1 -simplify_length 0.5 -simplify_area 1 -clean 5 -utm 19N -o dtm_contours_raster_1m.shp
+C:\> # Delinear edificios
+C:\> lasboundary -i tiles_final\fitch*.laz -merged -keep_class 6 -concavity 1.5 -disjoint -o buildings.shp
+C:\> 
+    \end{lstlisting}
+  }
+\begin{frame}
+  \frametitle{Cartografía derivada: Estudios Forestales}
+\derivados
+\end{frame}
 
 %%==================================================================F
 \againframe{portada}
